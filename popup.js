@@ -1,5 +1,15 @@
 var getImg = document.getElementById("getImg");
 var download = document.getElementById("download");
+var toggle = document.getElementById("toggle");
+var stop = document.getElementById("stop");
+
+toggle.addEventListener("click", () => {
+  chrome.runtime.sendMessage({ func: "queryTab" });
+});
+
+stop.addEventListener("click", () => {
+  chrome.runtime.sendMessage({ func: "stop" });
+});
 
 getImg.addEventListener("click", async () => {
   var [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
@@ -80,3 +90,7 @@ function parse() {
   }
   return urls;
 }
+
+var sleep = (ms) => {
+  return new Promise((resolve) => setTimeout(resolve, ms));
+};
