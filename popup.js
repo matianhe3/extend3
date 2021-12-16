@@ -2,13 +2,18 @@ var getImg = document.getElementById("getImg");
 var download = document.getElementById("download");
 var toggle = document.getElementById("toggle");
 var stop = document.getElementById("stop");
+var spider = document.getElementById("spider");
 
 toggle.addEventListener("click", () => {
-  chrome.runtime.sendMessage({ func: "queryTab" });
+  chrome.alarms.create("queryTab", { periodInMinutes: 0.08 });
+});
+
+spider.addEventListener("click", () => {
+  chrome.alarms.create("spider", { periodInMinutes: 0.08 });
 });
 
 stop.addEventListener("click", () => {
-  chrome.runtime.sendMessage({ func: "stop" });
+  chrome.runtime.sendMessage({ name: "stop" });
 });
 
 getImg.addEventListener("click", async () => {

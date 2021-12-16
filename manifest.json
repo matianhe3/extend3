@@ -3,7 +3,14 @@
   "description": "自动化测试扩展V3",
   "version": "1.0",
   "manifest_version": 3,
-  "permissions": ["tabs", "downloads", "scripting", "background"],
+  "permissions": [
+    "tabs",
+    "downloads",
+    "scripting",
+    "background",
+    "alarms",
+    "storage"
+  ],
   "background": {
     "service_worker": "background.js"
   },
