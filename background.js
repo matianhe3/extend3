@@ -1,9 +1,11 @@
+// 清除所有循环任务
 chrome.runtime.onMessage.addListener((res) => {
   if (res.name == "stop") {
     stop();
   }
 });
 
+// 监听循环任务, 选择执行
 chrome.alarms.onAlarm.addListener((res) => {
   if (res.name == "spider") {
     spider();
@@ -12,6 +14,7 @@ chrome.alarms.onAlarm.addListener((res) => {
   }
 });
 
+// 轮询页面方法
 function queryTab() {
   var index = 0;
   chrome.windows.getCurrent({ populate: true }, (res) => {
@@ -27,8 +30,9 @@ function queryTab() {
   });
 }
 
+// 一键迁房任务方法
 function spider() {
-  fetch("http://127.0.0.1:8080/spider/redis/tjstate", {
+  fetch("http://127.0.0.1:5151/spider/redis/tjMoveList", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
@@ -36,9 +40,11 @@ function spider() {
   })
     .then((res) => res.json())
     .then((result) => {
+      console.log(result);
       result.Items.forEach((el) => {
+        console.log(el);
         chrome.tabs.update({
-          url: "https://www.muniao.com/room/" + el.muniaoID + ".html",
+          url: "https://m.tujia.com/detail/" + el.rivalRoomID + ".htm",
         });
       });
     });
