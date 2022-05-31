@@ -11,7 +11,7 @@ toggle.addEventListener("click", () => {
 
 // 开启一件迁房循环任务
 spider.addEventListener("click", () => {
-  chrome.alarms.create("spider", { periodInMinutes: 0.08 });
+  chrome.alarms.create("spider", { periodInMinutes: 0.2 });
 });
 
 // 清除所有 循环任务
@@ -22,15 +22,23 @@ stop.addEventListener("click", () => {
 // 监听解析图片按钮点击事件, 把数据展示到popup页面.
 getImg.addEventListener("click", async () => {
   var [tab] = await chrome.tabs.query({ active: true, currentWindow: true });
-
   chrome.scripting.executeScript(
     {
-      target: { tabId: tab.id, allFrames: true },
+      target: { tabId: tab.id, allFrames: false },
       function: parse,
     },
-    (urls) => {
-      var num = urls[0].result;
-      var roomID = tab.url.match(/detail\/(\d+)(\.|$)/);
+      (urls) => {
+	  if(urls == undefined){
+	      return
+	  }
+	  var num = urls[0].result;
+	  if (tab.url.indexOf("tujia")!= -1) {
+	      var roomID = tab.url.match(/detail\/(\d+)(\.|$)/);
+	  } else if (tab.url.indexOf("airbnb")!= -1) {
+	      var roomID = tab.url.match(/rooms\/(\d+)(\?|$)/);
+	  } else {
+	      console.log("网站不支持.")
+	  }
       if (roomID && roomID.length > 0) {
         roomID = roomID[1];
       } else {
@@ -76,29 +84,45 @@ download.addEventListener("click", async () => {
 
 // 解析网页图片的URL, 缩略图展示到popup页面.
 function parse() {
-  var imgs = document.evaluate(
-    '//*[@id="app"]/article/div[@class="unit-image"]/div[@class="tj-swiper__mask"]/div[1]/div[1]/div/div/@style',
-    document,
-    null,
-    XPathResult.ANY_PYTE,
-    null
-  );
-  var urls = [];
-  var img = imgs.iterateNext();
-  var re = /"(http.*)"/;
-  while (img) {
-    var text = img.textContent;
-    img = imgs.iterateNext();
-    var pattern = text.match(re);
-    if (pattern && pattern.length > 1) {
-      var url = pattern[1];
-      var pixel = url.match(/thumb.*(_.*_.*)\./);
-      if (pixel && pixel.length > 0) {
-        url = url.replace(pixel[1], "");
+    var url = document.URL
+    var urls = [];
+    if (url.indexOf("tujia")!= -1) {
+      var imgs = document.evaluate(
+	  '//*[@id="app"]/article/div[@class="unit-image"]/div[@class="tj-swiper__mask"]/div[1]/div[1]/div/div/@style',
+	  document, null, XPathResult.ANY_PYTE, null);
+ 
+      var img = imgs.iterateNext();
+      var re = /"(http.*)"/;
+      while (img) {
+	  var text = img.textContent;
+	  img = imgs.iterateNext();
+	  var pattern = text.match(re);
+	  if (pattern && pattern.length > 1) {
+	      var url = pattern[1];
+	      var pixel = url.match(/thumb.*(_.*_.*)\./);
+	      if (pixel && pixel.length > 0) {
+		  url = url.replace(pixel[1], "");
+	      }
+	      url = url.replace("/thumb", "");
+	  }
+	  urls.push(url);
       }
-      url = url.replace("/thumb", "");
-    }
-    urls.push(url);
+    } else if (url.indexOf("airbnb")!= -1){
+	var imgs = document.evaluate(
+	  "//button[@class='_1ewldjs' or @class='_77rw9o7']/img/@src",
+	  document,
+	  null,
+	  XPathResult.ANY_PYTE,
+	  null
+      );
+      var img = imgs.iterateNext();
+      while (img) {
+	  url = img.textContent.replace("?aki_policy=small", "")
+	  img = imgs.iterateNext();
+	  urls.push(url)
+      }
+  } else {
+      console.log("网站不支持.")
   }
   return urls;
 }

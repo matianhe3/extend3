@@ -32,7 +32,7 @@ function queryTab() {
 
 // 一键迁房任务方法
 function spider() {
-  fetch("http://127.0.0.1:5151/spider/redis/tjMoveList", {
+  fetch("http://192.168.16.212:5151/spider/redis/tjMoveList", {
     method: "GET",
     headers: {
       "Content-Type": "application/json",
