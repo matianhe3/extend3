@@ -2,16 +2,22 @@ var getImg = document.getElementById("getImg");
 var download = document.getElementById("download");
 var toggle = document.getElementById("toggle");
 var stop = document.getElementById("stop");
-var spider = document.getElementById("spider");
+var tjSpider = document.getElementById("tjSpider");
+var airSpider = document.getElementById("airSpider");
 
 // 开启页面轮询任务
 toggle.addEventListener("click", () => {
   chrome.alarms.create("queryTab", { periodInMinutes: 0.08 });
 });
 
-// 开启一件迁房循环任务
-spider.addEventListener("click", () => {
-  chrome.alarms.create("spider", { periodInMinutes: 0.2 });
+// 开启途家一件迁房循环任务
+tjSpider.addEventListener("click", () => {
+  chrome.alarms.create("tjSpider", { periodInMinutes: 0.2 });
+});
+
+// 开启爱彼迎一件迁房循环任务
+airSpider.addEventListener("click", () => {
+  chrome.alarms.create("airSpider", { periodInMinutes: 0.2 });
 });
 
 // 清除所有 循环任务
